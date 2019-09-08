@@ -33,7 +33,7 @@ def get_removed(comment):
     if retrieved == comment.body:
         return "The comment was removed too quickly"
 
-    return f"`{about}`:\n\n>{retrieved}\n\n[source](https://github.com/basswaver/removemenot)"
+    return f"`{author}`:\n\n>{retrieved}\n\n[about](https://github.com/basswaver/removemenot)"
 
 
 def write_buffer(item):
