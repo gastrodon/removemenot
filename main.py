@@ -56,12 +56,6 @@ def monitor_buffer():
         time.sleep(10)
         while len(buffer):
             item = pop_buffer()
-            if not isinstance(item.parent(), praw.models.Comment):
-                continue
-
-            if not isinstance(item.parent().parent(), praw.models.Comment):
-                continue
-
             retrieved = get_removed(item.parent().parent())
 
             try:
@@ -80,6 +74,9 @@ def monitor_inbox():
         for item in praw.models.util.stream_generator(reddit.inbox.unread):
             if not isinstance(item, praw.models.Comment):
                 item.mark_read()
+                continue
+
+            if item.author.name == "removemenot":
                 continue
 
             if not isinstance(item.parent(), praw.models.Comment):
@@ -107,6 +104,9 @@ def monitor_all():
         time.sleep(2)
         for item in reddit.subreddit("all").stream.comments():
             if not re.search(regex, item.body):
+                continue
+
+            if item.author.name == "removemenot":
                 continue
 
             if not isinstance(item.parent(), praw.models.Comment):
