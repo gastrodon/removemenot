@@ -53,7 +53,7 @@ def monitor_buffer():
     global buffer
 
     while True:
-        time.sleep(10)
+        time.sleep(100)
         while len(buffer):
             item = pop_buffer()
             retrieved = get_removed(item.parent().parent())
@@ -76,7 +76,7 @@ def monitor_inbox():
                 item.mark_read()
                 continue
 
-            if item.author.name == "removemenot":
+            if item.author.name.lower() == "removemenot":
                 continue
 
             if not isinstance(item.parent(), praw.models.Comment):
@@ -106,7 +106,7 @@ def monitor_all():
             if not re.search(regex, item.body):
                 continue
 
-            if item.author.name == "removemenot":
+            if item.author.name.lower() == "removemenot":
                 continue
 
             if not isinstance(item.parent(), praw.models.Comment):
