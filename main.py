@@ -27,13 +27,13 @@ def get_removed(comment):
     if response.status_code != 200 or not response.json().get("data", False):
         return "I couldn't get the comment. Try removeddit?"
 
-    retrieved = response.json()["data"][0]["body"]
+    retrieved = response.json()["data"][0]["body"].replace("\n\n", "\n\n>")
     author = response.json()["data"][0]["author"]
 
     if retrieved == comment.body:
         return "The comment was removed too quickly"
 
-    return f"`{author}`:\n\n>{retrieved}"
+    return f"`{about}`:\n\n>{retrieved}\n\n[source](https://github.com/basswaver/removemenot)"
 
 
 def write_buffer(item):

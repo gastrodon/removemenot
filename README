@@ -1,0 +1,7 @@
+Retrieves removed comments. Authored by /u/dieschwule, because removeddit is too many steps.
+
+removemenot can be called with a comment that has words matching the regex `(W|w)hat did (\w)+ say`, or by mentioning /u/removemenot in a comment.
+
+Comments should be the reply to the reply to a deleted comment (ie `[deleted] -> ok my guy -> what did he say?`)
+
+If there are bugs or you want to change how this robot behaves (including moderation concerns, like excluding your subreddit instead if issuing a ban), open an issue or message /u/dieschwule (preferably the first one, I don't use reddit a lot on that account)
