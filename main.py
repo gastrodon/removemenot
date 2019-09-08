@@ -85,8 +85,8 @@ def monitor_inbox():
             if not isinstance(item.parent().parent(), praw.models.Comment):
                 continue
 
-            if item.parent().parent(
-            ).body != "[deleted]" and comment.body != "[removed]":
+            if item.parent().parent().body != "[deleted]" and item.parent(
+            ).parent().body != "[removed]":
                 continue
 
             retrieved = get_removed(item.parent().parent())
@@ -119,8 +119,8 @@ def monitor_all():
             if not isinstance(item.parent().parent(), praw.models.Comment):
                 continue
 
-            if item.parent().parent(
-            ).body != "[deleted]" and comment.body != "[removed]":
+            if item.parent().parent().body != "[deleted]" and item.parent(
+            ).parent().body != "[removed]":
                 continue
 
             retrieved = get_removed(item.parent().parent())
