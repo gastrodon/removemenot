@@ -58,7 +58,8 @@ def handle_comment(request, source):
         return
 
     if any(({removed.body == "[deleted]", removed.body == "[removed]"})):
-        print(f"[handled] from {request.author}")
+        print(f"[handled] from {request.author}                         ",
+              end = "\r")
         return handle_reply(request)
 
 
@@ -94,4 +95,6 @@ def handle_reply(request):
 
     except praw.exceptions.APIException:
         write_buffer(request)
-        return print(f"[buffered] from {request.author}")
+        return print(
+            f"[buffered] from {request.author}                         ",
+            end = "\r")
