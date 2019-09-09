@@ -1,4 +1,5 @@
 import requests, praw, os, re, json, threading, time
+import process
 
 with open(f"{os.path.dirname(os.path.abspath(__file__))}/config.json") as c:
     config = json.load(c)
@@ -11,127 +12,35 @@ reddit = praw.Reddit(user_agent = config["agent"],
 
 print(f"{reddit.user.me()} may not be removed")
 
-push_api = "https://api.pushshift.io/reddit"
-buffer = []
-buffer_lock = threading.Lock()
-
-
-def get_removed(comment):
-    params = {"ids": comment.id, "size": 1}
-
-    if comment.body != "[deleted]" and comment.body != "[removed]":
-        return "I think that this isn't deleted yet"
-
-    response = requests.get(f"{push_api}/search/comment", params = params)
-
-    if response.status_code != 200 or not response.json().get("data", False):
-        return "I couldn't get the comment. Try removeddit?"
-
-    retrieved = response.json()["data"][0]["body"].replace("\n\n", "\n\n>")
-    author = response.json()["data"][0]["author"]
-
-    if retrieved == comment.body:
-        return "The comment was removed too quickly"
-
-    return f"`{author}`:\n\n>{retrieved}\n\n[about](https://github.com/basswaver/removemenot)"
-
-
-def write_buffer(item):
-    buffer_lock.acquire()
-    buffer.append(item)
-    buffer_lock.release()
-
-
-def pop_buffer():
-    buffer_lock.acquire()
-    val = buffer.pop()
-    buffer_lock.release()
-    return val
-
 
 def monitor_buffer():
-    global buffer
-
+    print("[monitoring] buffer")
     while True:
+        print(f"[buffer] size: {len(process.buffer)}", end = "\r")
+
+        while len(process.buffer):
+            process.handle_comment(process.pop_buffer())
         time.sleep(100)
-        while len(buffer):
-            item = pop_buffer()
-            retrieved = get_removed(item.parent().parent())
-
-            try:
-                item.reply(retrieved)
-                print(f"[buffer] from {item.author}")
-
-            except praw.exceptions.APIException:
-                write_buffer(item)
-                print(f"[buffer] from {item.author} - buffered")
-                break
 
 
 def monitor_inbox():
+    print("[monitoring] inbox")
     while True:
-        time.sleep(2)
         for item in praw.models.util.stream_generator(reddit.inbox.unread):
-            if not isinstance(item, praw.models.Comment):
-                item.mark_read()
-                continue
+            threading.Thread(target = process.handle_comment,
+                             args = (item, "inbox")).start()
 
-            if item.author.name.lower() == "removemenot":
-                continue
-
-            if not isinstance(item.parent(), praw.models.Comment):
-                continue
-
-            if not isinstance(item.parent().parent(), praw.models.Comment):
-                continue
-
-            if item.parent().parent().body != "[deleted]" and item.parent(
-            ).parent().body != "[removed]":
-                continue
-
-            retrieved = get_removed(item.parent().parent())
-
-            try:
-                item.reply(retrieved)
-                print(f"[inbox] from {item.author}")
-
-            except praw.exceptions.APIException:
-                write_buffer(item)
-                print(f"[inbox] from {item.author} - buffered")
-
-            item.mark_read()
+        time.sleep(1)
 
 
 def monitor_all():
-    regex = "(W|w)hat did (\w)+ say"
-    while True:
-        time.sleep(2)
+    print("[monitoring] all")
+    while False:
         for item in reddit.subreddit("all").stream.comments():
-            if not re.search(regex, item.body):
-                continue
+            threading.Thread(target = process.handle_comment,
+                             args = (item, "all")).start()
 
-            if item.author.name.lower() == "removemenot":
-                continue
-
-            if not isinstance(item.parent(), praw.models.Comment):
-                continue
-
-            if not isinstance(item.parent().parent(), praw.models.Comment):
-                continue
-
-            if item.parent().parent().body != "[deleted]" and item.parent(
-            ).parent().body != "[removed]":
-                continue
-
-            retrieved = get_removed(item.parent().parent())
-
-            try:
-                item.reply(retrieved)
-                print(f"[all] from {item.author}")
-
-            except praw.exceptions.APIException:
-                write_buffer(item)
-                print(f"[all] from {item.author} - buffered")
+        time.sleep(1)
 
 
 def main():
