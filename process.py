@@ -70,7 +70,7 @@ def get_removed(comment):
     response = requests.get(f"{push_api}/search/comment", params = params)
 
     if response.status_code != 200 or not response.json().get("data", False):
-        return request.reply("I couldn't get the comment. Try removeddit?")
+        return "I couldn't get the comment. Try removeddit?"
 
     retrieved = response.json()["data"][0]["body"].replace("\n\n", "\n\n>")
     author = response.json()["data"][0]["author"]
@@ -97,4 +97,9 @@ def handle_reply(request):
         write_buffer(request)
         return print(
             f"[buffered] from {request.author}                         ",
+            end = "\r")
+
+    except praw.exceptions.Forbidden:
+        return print(
+            f"[forbidden] from {request.author}                         ",
             end = "\r")

@@ -16,8 +16,8 @@ print(f"{reddit.user.me()} may not be removed")
 def monitor_buffer():
     print("[monitoring] buffer")
     while True:
-        print(f"[buffer] size: {len(process.buffer)}                         ",
-              end = "\r")
+        # print(f"[buffer] size: {len(process.buffer)}                         ",
+        #      end = "\r")
 
         while len(process.buffer):
             process.handle_comment(process.pop_buffer())
