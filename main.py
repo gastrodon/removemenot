@@ -17,17 +17,19 @@ def monitor_buffer():
     print("[monitoring] buffer")
     while True:
         while len(process.buffer):
+            item = process.pop_buffer()
             threading.Thread(target = process.handle_comment,
-                             args = (process.pop_buffer())).start()
+                             args = [item]).start()
 
 
 def monitor_inbox():
     print("[monitoring] inbox")
     while True:
+        print(f"[inbox?]                         ", end = "\r")
         for item in praw.models.util.stream_generator(reddit.inbox.unread):
-            if process.should_handle(item, "all"):
+            if process.should_handle(item, "inbox"):
                 threading.Thread(target = process.handle_comment,
-                                 args = (item)).start()
+                                 args = [item]).start()
 
         time.sleep(1)
 
@@ -35,10 +37,11 @@ def monitor_inbox():
 def monitor_all():
     print("[monitoring] all")
     while True:
+        print(f"[all?]                         ", end = "\r")
         for item in reddit.subreddit("all").stream.comments():
             if process.should_handle(item, "all"):
                 threading.Thread(target = process.handle_comment,
-                                 args = (item)).start()
+                                 args = [item]).start()
 
         time.sleep(1)
 
