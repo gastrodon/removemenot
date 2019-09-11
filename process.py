@@ -1,4 +1,4 @@
-import requests, praw, threading
+import requests, praw, threading, re
 
 buffer = []
 buffer_lock = threading.Lock()
