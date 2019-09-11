@@ -42,13 +42,10 @@ def should_handle(request, source):
         return re.search(regex, request.body)
 
 
-def handle_comment(request, source):
+def handle_comment(request):
     """
     determine how to reply to a ping, in order of precedence
     """
-    if not should_handle(request, source):
-        return
-
     removed = request.parent().parent()
 
     if not isinstance(request.parent(), praw.models.Comment):
