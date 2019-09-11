@@ -33,7 +33,7 @@ def monitor_inbox():
 
 def monitor_all():
     print("[monitoring] all")
-    while False:
+    while True:
         for item in reddit.subreddit("all").stream.comments():
             threading.Thread(target = process.handle_comment,
                              args = (item, "all")).start()
